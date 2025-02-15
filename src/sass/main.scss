@@ -1,3 +1,29 @@
 @import url('./layout/_header.scss');
 @import url('./pages/_homepage.scss');
 @import url('./pages/_notfoundpage.scss');
+
+.buttonStyle {
+    position: relative;
+    overflow: hidden;
+}
+
+.buttonStyle::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: var(--button-animation-color);
+    transform: skewX(-30deg);
+    transition: left 0.5s ease-in-out;
+}
+
+.buttonStyle:hover::before{
+    left: 100%;
+}
+
+.activeLink{
+    color: #155dfc;
+    font-weight: 500;
+}
