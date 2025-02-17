@@ -45,6 +45,8 @@ const AppRoutes = () => {
 
   const isAdminRoute = adminRoutes.includes(location.pathname);
 
+  // const token = "dsfsd"
+  // const role = "user";
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 
