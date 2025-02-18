@@ -45,10 +45,10 @@ const AppRoutes = () => {
 
   const isAdminRoute = adminRoutes.includes(location.pathname);
 
-  // const token = "dsfsd"
-  // const role = "user";
-  const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const token = "dsfsd"
+  const role = "user";
+/*   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role"); */
 
   if (isPublicRoute && token == null) {
     return (

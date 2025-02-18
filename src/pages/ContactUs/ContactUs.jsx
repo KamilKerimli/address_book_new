@@ -1,10 +1,9 @@
-import React from 'react'
+import React from 'react';
+import ContactUsCom from "../../components/ContactUsCom/ContactUsCom";
 
 const ContactUs = () => {
   return (
-    <div>
-        <p>ContactUs Page</p>
-    </div>
+    <ContactUsCom />
   )
 }
 
