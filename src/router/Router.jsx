@@ -1,10 +1,16 @@
-import React from 'react';
-import { BrowserRouter, useLocation, Routes, Route, Navigate } from 'react-router-dom';
-import UserRouter from './UserRouter';
-import AdminRouter from './AdminRouter';
-import Login from '../pages/Login/Login';
-import Register from '../pages/Register/Register';
-import Forgot from '../pages/Forgot/Forgot';
+import React from "react";
+import {
+  BrowserRouter,
+  useLocation,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import UserRouter from "./UserRouter";
+import AdminRouter from "./AdminRouter";
+import Login from "../pages/Login/Login";
+import Register from "../pages/Register/Register";
+import Forgot from "../pages/Forgot/Forgot";
 
 const Router = () => {
   return (
@@ -18,37 +24,35 @@ const AppRoutes = () => {
   const location = useLocation();
 
   const publicRoutes = [
-    { path: '/login', element: <Login /> } ,
-    { path: '/register', element: <Register /> },
-    { path: '/forgot', element: <Forgot /> },
-    { path: '/verify', element: <Forgot /> },
+    { path: "/login", element: <Login /> },
+    { path: "/register", element: <Register /> },
+    { path: "/forgot", element: <Forgot /> },
+    { path: "/verify", element: <Forgot /> },
   ];
 
   const userRoutes = [
-    '/',
-    '/home',
-    '/about',
-    '/contact-us',
-    '/advsearch',
-    '/profile/settings',
+    "/",
+    "/home",
+    "/about",
+    "/contact-us",
+    "/advsearch",
+    "/profile/settings",
   ];
 
-  const adminRoutes = [
-    '/admin',
-    '/admin/dashboard',
-    '/admin/settings',
-  ];
+  const adminRoutes = ["/admin", "/admin/dashboard", "/admin/settings"];
 
-  const isPublicRoute = publicRoutes.some(route => route.path === location.pathname);
+  const isPublicRoute = publicRoutes.some(
+    (route) => route.path === location.pathname
+  );
 
   const isUserRoute = userRoutes.includes(location.pathname);
 
   const isAdminRoute = adminRoutes.includes(location.pathname);
 
-  const token = "dsfsd"
-  const role = "user";
-/*   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role"); */
+  // const token = "dsfsd"
+  // const role = "user";
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
   if (isPublicRoute && token == null) {
     return (
@@ -61,15 +65,11 @@ const AppRoutes = () => {
   }
 
   if (token !== null && role === "user" && isUserRoute) {
-    return (
-      <UserRouter />
-    );
+    return <UserRouter />;
   }
 
   if (token !== null && role === "admin" && isAdminRoute) {
-    return (
-        <AdminRouter />
-    );
+    return <AdminRouter />;
   }
 
   return <Navigate to="/login" replace />;
