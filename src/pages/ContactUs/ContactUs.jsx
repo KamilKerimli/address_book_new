@@ -3,7 +3,9 @@ import ContactUsCom from "../../components/ContactUsCom/ContactUsCom";
 
 const ContactUs = () => {
   return (
-    <ContactUsCom />
+    <div className="dark:bg-gray-700">
+      <ContactUsCom />
+    </div>
   )
 }
 

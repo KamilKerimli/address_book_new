@@ -1,8 +1,6 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
 
 const NotFoundCom = () => {
-    const nav = useNavigate();
     return (
         <><div className='container-ntf'>
         {[...Array(30)].map((_, i) => (

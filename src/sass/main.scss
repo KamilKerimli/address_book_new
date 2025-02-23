@@ -49,3 +49,24 @@
     color: #155dfc;
     font-weight: 500;
 }
+
+@media (max-width: 768px) {
+    //AdvencedSearch Partiton
+    .adv-users-table {
+        display: none;
+    }
+    .adv-users-cards {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    //AdvencedSearch Partiton
+    .adv-users-table {
+        display: table;
+        width: 100%; 
+    }
+    .adv-users-cards {
+        display: none;
+    }
+}

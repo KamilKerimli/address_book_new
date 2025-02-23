@@ -4,10 +4,8 @@
 
 :root {
     --button-animation-color: #ffffff33;
-    --icon-color: #364153;
   }
   
 .dark {
     --button-animation-color: #1d4fd899;
-    --icon-color: #155dfc;
   }

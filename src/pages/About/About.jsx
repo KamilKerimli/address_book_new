@@ -3,7 +3,9 @@ import AboutCom from "../../components/AboutCom/AboutCom";
 
 const About = () => {
   return (
-    <AboutCom />
+    <div className="dark:bg-gray-700">
+      <AboutCom />
+    </div>
   )
 }
 

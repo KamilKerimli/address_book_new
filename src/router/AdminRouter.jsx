@@ -1,12 +1,37 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import Admin from '../pages/Admin/Admin';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import Dashboard from '../pages/AdminPages/Dashboard/Dashboard';
+import Users from '../pages/AdminPages/Users/Users';
+import Roles from '../pages/AdminPages/Roles/Roles';
+import ImportAndExport from '../pages/AdminPages/ImportAndExport/ImportAndExport';
+import NotFound from '../pages/NotFound/NotFound';
+import NavBarCom from '../components/NavBarCom/NavBarCom';
+import FooterCom from '../components/FooterCom/FooterCom';
 
 const AdminRouter = () => {
+  const adminEndpoints = [
+    {key: 1, href: '/', value: "DASHBOARD"},
+    {key: 2, href: '/users', value: "USERS"},
+    {key: 3, href: '/roles', value: "ROLES"},
+    {key: 4, href: '/imExp', value: "IMPORT/EXPORT"}
+  ]
   return (
-    <Routes>
-      <Route path='/admin' element={<Admin />} />
-    </Routes>
+    <div className="flex flex-col min-h-screen">
+      <NavBarCom tabs={adminEndpoints} />
+      <main className="flex-grow dark:bg-gray-700 dark:text-white">
+        <Routes>
+          <Route path='/' element={<Dashboard />} />
+          <Route path='/admin' element={<Navigate to='/' replace />} />
+          <Route path='/home' element={<Navigate to='/' replace />} />
+          <Route path='/dashboard' element={<Navigate to='/' replace />} />
+          <Route path='/users' element={<Users />} />
+          <Route path='/roles' element={<Roles />} />
+          <Route path='/imExp' element={<ImportAndExport />} />
+          <Route path='/*' element={<NotFound />} />
+        </Routes>
+      </main>
+      <FooterCom type='admin' />
+    </div>
   );
 };
 
