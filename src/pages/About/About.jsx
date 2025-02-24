@@ -1,9 +1,10 @@
-import React from 'react'
+import React from 'react';
+import AboutCom from "../../components/AboutCom/AboutCom";
 
 const About = () => {
   return (
-    <div>
-        <p>About Page</p>
+    <div className="dark:bg-gray-700">
+      <AboutCom />
     </div>
   )
 }

@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --button-animation-color: #ffffff33;
+  }
+  
+.dark {
+    --button-animation-color: #1d4fd899;
+  }
