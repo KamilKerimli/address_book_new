@@ -37,8 +37,9 @@ const DarkModeToggle = () => {
   }
   
   const logout = () => {
-    localStorage.setItem("token", null);
-    localStorage.setItem("role", null);
+    localStorage.removeItem("toke");
+    localStorage.removeItem("role");
+    localStorage.removeItem("email");
     window.location.reload();
   }
   

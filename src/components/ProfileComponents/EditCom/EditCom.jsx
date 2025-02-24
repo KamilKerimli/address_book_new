@@ -1,25 +1,113 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import dfltImg from "../../../assets/defaultProfileImg.png";
 
 const EditCom = () => {
     const [user, setUser] = useState(null);
+    const [username, setUsername] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [country, setCountry] = useState('');
+    const [location, setLocation] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [birthday, setBirthday] = useState('');
     const [addressList, setAddressList] = useState([]);
-    const [isVerificationStep, setIsVerificationStep] = useState(false);
-    const [timeoutId, setTimeoutId] = useState(null);
-    const [showPasswordForm, setShowPasswordForm] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null); // Seçilən şəkli saxlamaq üçün state
+    const [selectedImage, setSelectedImage] = useState(null); 
+    const [file, setFile] = useState(null); 
 
-    // Şəkil seçildikdə işləyəcək funksiya
+    useEffect(() => {
+        const getUser = async () => {
+            const localEmail = localStorage.getItem("email");
+            const response = await fetch(`http://localhost:1144/users/?email=${localEmail}`, {
+                method: 'GET'
+            });
+    
+            const result = await response.json();
+            
+            if (!response.ok) {
+                alert(result.message);
+                return;
+            }
+    
+            if (result.user) {
+                setUser(JSON.parse(JSON.stringify(result.user)));
+                setUsername(result.user.username || '');
+                setFirstName(result.user.first_name || '');
+                setLastName(result.user.last_name || '');
+                setCountry(result.user.country || '');
+                setLocation(result.user.location || '');
+                setEmail(result.user.email || '');
+                setPhone(result.user.phone || '');
+                setBirthday(result.user.birthday || '');
+            } else {
+                console.warn('User data is empty:', result.user);
+            }
+        };
+        const getAddresses = async () => {
+            const localEmail = localStorage.getItem("email");
+            const response = await fetch(`http://localhost:1144/address/getAddresses?email=${localEmail}`, {
+                method: 'GET'
+            });
+    
+            const result = await response.json();
+            
+            if (!response.ok) {
+                alert(result.message);
+                return;
+            }
+    
+            if (result.address) {
+                setAddressList(result.address);
+                console.log(result.address);
+            } else {
+                console.warn('Address data is empty:', result.address);
+            }
+        };
+    
+        getUser();
+        getAddresses();
+    }, []);    
+
+    const saveInfo = async() => {
+        const response = await fetch(`http://localhost:1144/users/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                file, 
+                username,
+                firstName,
+                lastName,
+                country,
+                location,
+                email,
+                phone,
+                birthday,
+                addressList
+            }),
+        });
+    
+        if (!response.ok) {
+            alert("Please check network. The problem occurred.");
+            return;
+        }
+    
+        const result = await response.json();
+        // module run.
+    }
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // Fayl tipini yoxlamaq
             const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
             if (allowedTypes.includes(file.type)) {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    setSelectedImage(reader.result); // Şəkli base64 formatında saxla
+                    setSelectedImage(reader.result);
                 };
                 reader.readAsDataURL(file);
+                setFile(file);
             } else {
                 alert('Yalnız .png, .jpeg və .webp formatlı fayllar qəbul olunur.');
             }
@@ -27,7 +115,8 @@ const EditCom = () => {
     };
 
     const handleAddAddress = () => {
-        const newAddress = { type: '', shortName: '', fullAddress: '' };
+        const currentEmail = localStorage.getItem("email");
+        const newAddress = { _id: null, email: currentEmail, addressType: '', shortAddress: '', realAddress: '' };
         setAddressList([...addressList, newAddress]);
     };
 
@@ -42,26 +131,6 @@ const EditCom = () => {
         setAddressList(updatedList);
     };
 
-    const handleGetCode = () => {
-        if (!isVerificationStep) {
-            setIsVerificationStep(true);
-            setShowPasswordForm(false);
-            const id = setTimeout(() => {
-                setIsVerificationStep(false);
-            }, 60000);
-            setTimeoutId(id);
-        } else {
-            clearTimeout(timeoutId);
-            setIsVerificationStep(false);
-            setShowPasswordForm(true);
-        }
-    };
-
-    const handleSavePassword = (e) => {
-        e.preventDefault();
-        console.log("Password changed");
-    };
-
     return (
         <div className="mx-auto px-4 py-6 dark:bg-gray-700">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -70,12 +139,12 @@ const EditCom = () => {
                     <div className="flex flex-col items-center">
                         {selectedImage ? (
                             <img className="w-40 h-40 rounded-full mb-2" src={selectedImage} alt="Selected" />
-                        ) : user ? (
-                            <img className="w-40 h-40 rounded-full mb-2" src={user.ImgURL} alt="Avatar" />
                         ) : (
-                            <svg className="w-40 h-40 rounded-full my-4 text-gray-600 dark:text-white bg-transparent" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 1.2c-3 0-9 1.5-9 4.5v1.5c0 .6.3.9.9.9h16.2c.6 0 .9-.3.9-.9V17.7c0-3-6-4.5-9-4.5z" />
-                            </svg>
+                            <img 
+                                className="w-40 h-40 rounded-full mb-2" 
+                                src={ user?.imgURL && user.imgURL !== "defaultProfileImg" ? user.imgURL : dfltImg } 
+                                alt="Avatar" 
+                            />
                         )}
                         <p className="text-gray-500 dark:text-gray-300 text-sm mb-2">JPG, PNG, or WEBP no larger than 5 MB</p>
                         <label className="bg-blue-500 text-white px-4 py-2 rounded-lg dark:bg-white dark:text-blue-600 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white cursor-pointer">
@@ -90,43 +159,68 @@ const EditCom = () => {
                     <form>
                         <div className="mb-3">
                             <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputUsername">Username</label>
-                            <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputUsername" type="text" placeholder="Enter your username" readOnly={true} disabled={true} /> {/* readonly ve disabled gelen requeste gore teyin olunsun (email-de)*/}
+                            <input 
+                                className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                id="inputUsername" type="text" placeholder="Enter your username" readOnly={true} disabled={true} 
+                                value={user?.username || ''}/> 
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                             <div>
                                 <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputFirstName">First Name</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputFirstName" type="text" placeholder="Enter first name" />
+                                <input 
+                                    className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                    id="inputFirstName" type="text" placeholder="Enter first name" 
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    value={user?.first_name || ''}/>
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputLastName">Last Name</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputLastName" type="text" placeholder="Enter last name" />
+                                <input 
+                                    className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                    id="inputLastName" type="text" placeholder="Enter last name"
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    value={user?.last_name || ''}/>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                             <div>
                                 <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputOrgName">Country</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputOrgName" type="text" placeholder="Enter country" />
+                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                    id="inputOrgName" type="text" placeholder="Enter country" 
+                                    onChange={(e) => setCountry(e.target.value)}
+                                    value={user?.country || ''}/>
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputLocation">Location</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputLocation" type="text" placeholder="Enter current location" value="Azerbaijan, Baku" onChange={(e) => console.log("Location changed")} />
+                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                    id="inputLocation" type="text" placeholder="Enter current location"
+                                    onChange={(e) => setLocation(e.target.value)} 
+                                    value={user?.location || ''}/>
                             </div>
                         </div>
                         <div className="mb-3">
                             <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputEmailAddress">Email</label>
-                            <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputEmailAddress" type="email" placeholder="example@mail.com" />
+                            <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                id="inputEmailAddress" type="email" placeholder="example@mail.com" 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                value={user?.email || ''}/>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                             <div>
                                 <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputPhone">Phone</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputPhone" type="tel" placeholder="(+994) 12 345 67 89" />
+                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                    id="inputPhone" type="tel" placeholder="(+994) 12 345 67 89" 
+                                    onChange={(e) => setPhone(e.target.value)} 
+                                    value={user?.phoneNumber || ''}/>
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputBirthday">Birthday</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputBirthday" type="date" placeholder="01/01/2025" />
+                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" 
+                                    id="inputBirthday" type="date" placeholder="01/01/2025"
+                                    onChange={(e) => setBirthday(e.target.value)} 
+                                    value={user?.birthday || ''} />
                             </div>
                         </div>
-                        <button className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg dark:bg-white dark:text-blue-600 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white">Save Information</button>
                     </form>
 
                     <h2 className="text-lg font-semibold mb-4 mt-8">Addresses</h2>
@@ -144,24 +238,8 @@ const EditCom = () => {
                         </div>
                     </div>
 
-                    <h2 className="text-lg font-semibold mb-4 mt-8">Change Password</h2>
-                    <div id="verifyArea" className="w-80 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input className={`w-full p-2 mr-4 ${isVerificationStep ? '' : 'hidden'} border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100`} id="verifyInput" type="text" placeholder="Enter mail code" />
-                        <button onClick={handleGetCode} className="w-36 bg-blue-500 text-white px-4 py-2 rounded-lg dark:bg-white dark:text-blue-600 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white">{isVerificationStep ? 'Verify' : 'Get Code'}</button>
-                    </div>
-                    <form id="changeArea" className={`${showPasswordForm ? '' : 'hidden'}`} onSubmit={handleSavePassword}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                            <div>
-                                <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputNewPass">New Password</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputNewPass" type="password" placeholder="Enter new password" />
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600 dark:text-white" htmlFor="inputConfirmPass">Confirm Password</label>
-                                <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-400 dark:text-white dark:placeholder:text-gray-100" id="inputConfirmPass" type="password" placeholder="Enter confirm password" />
-                            </div>
-                        </div>
-                        <button type="submit" className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg dark:bg-white dark:text-blue-600 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white">Save Password</button>
-                    </form>
+                    <button className="w-full bg-blue-500 text-white px-4 py-2 mt-6 rounded-lg dark:bg-white dark:text-blue-600 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 dark:hover:text-white"
+                        onClick={(e)=>{saveInfo();}}>Save Information</button>
                 </div>
             </div>
         </div>
@@ -188,17 +266,23 @@ const AddressSection = ({ address, onSave, onDelete }) => {
                 <div>
                     <label className="text-sm font-medium text-gray-600 dark:text-white">Address Type</label>
                     <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-500 dark:text-white dark:placeholder:text-gray-100" 
-                        type="text" placeholder="Home, Work, etc." value={localAddress.type} onChange={(e) => setLocalAddress({ ...localAddress, type: e.target.value })} readOnly={!isEditing}  />
+                        type="text" placeholder="Home, Work, etc." 
+                        value={localAddress?.addressType || ''} 
+                        onChange={(e) => setLocalAddress({ ...localAddress, addressType: e.target.value })} readOnly={!isEditing}  />
                 </div>
                 <div>
                     <label className="text-sm font-medium text-gray-600 dark:text-white">Short Name</label>
                     <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-500 dark:text-white dark:placeholder:text-gray-100" 
-                        type="text" placeholder="Unique name" value={localAddress.shortName} onChange={(e) => setLocalAddress({ ...localAddress, shortName: e.target.value })}/>
+                        type="text" placeholder="Unique name" 
+                        value={localAddress?.shortAddress || ''} 
+                        onChange={(e) => setLocalAddress({ ...localAddress, shortAddress: e.target.value })}/>
                 </div>
                 <div>
                     <label className="text-sm font-medium text-gray-600 dark:text-white">Full Address</label>
                     <input className="w-full p-2 border border-black dark:border-blue-400 rounded-lg focus:ring dark:focus:ring-blue-300 focus:ring-black dark:bg-blue-500 dark:text-white dark:placeholder:text-gray-100" 
-                        type="text" placeholder="Full address" value={localAddress.fullAddress} onChange={(e) => setLocalAddress({ ...localAddress, fullAddress: e.target.value })} readOnly={!isEditing} />
+                        type="text" placeholder="Full address" 
+                        value={localAddress?.realAddress || ''} 
+                        onChange={(e) => setLocalAddress({ ...localAddress, realAddress: e.target.value })} readOnly={!isEditing} />
                 </div>
             </div>
             <div className="flex justify-end">

@@ -10,8 +10,6 @@ import NavBarCom from '../components/NavBarCom/NavBarCom';
 import FooterCom from '../components/FooterCom/FooterCom';
 
 
-
-
 const UserRouter = () => {
   const userEndpoints = [
     {key: 1, href: '/', value: "HOME"},

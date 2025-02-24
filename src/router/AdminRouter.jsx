@@ -3,18 +3,18 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from '../pages/AdminPages/Dashboard/Dashboard';
 import Users from '../pages/AdminPages/Users/Users';
 import Roles from '../pages/AdminPages/Roles/Roles';
-import ImportAndExport from '../pages/AdminPages/ImportAndExport/ImportAndExport';
 import NotFound from '../pages/NotFound/NotFound';
 import NavBarCom from '../components/NavBarCom/NavBarCom';
 import FooterCom from '../components/FooterCom/FooterCom';
+import EditCom from '../components/ProfileComponents/EditCom/EditCom';
 
 const AdminRouter = () => {
   const adminEndpoints = [
     {key: 1, href: '/', value: "DASHBOARD"},
     {key: 2, href: '/users', value: "USERS"},
-    {key: 3, href: '/roles', value: "ROLES"},
-    {key: 4, href: '/imExp', value: "IMPORT/EXPORT"}
+    {key: 3, href: '/roles', value: "ROLES"}
   ]
+
   return (
     <div className="flex flex-col min-h-screen">
       <NavBarCom tabs={adminEndpoints} />
@@ -26,7 +26,7 @@ const AdminRouter = () => {
           <Route path='/dashboard' element={<Navigate to='/' replace />} />
           <Route path='/users' element={<Users />} />
           <Route path='/roles' element={<Roles />} />
-          <Route path='/imExp' element={<ImportAndExport />} />
+          <Route path='/profile' element={<EditCom />} />
           <Route path='/*' element={<NotFound />} />
         </Routes>
       </main>

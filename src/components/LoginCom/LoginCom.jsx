@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
 
 const LoginCom = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    // const nav = useNavigate();
 
     const handleInputChange = (event, tag) => {
         if (tag === 'email') {
@@ -14,36 +12,22 @@ const LoginCom = () => {
         }
     };
 
-    // const validateInput = (value, regex) => {
-    //     if (!value) {
-    //     //   setError('PLease enter value');
-    //       return false;
-    //     }
-    //     if (!regex.test(value)) {
-    //     //   setError('Please correct format set.');
-    //       return false;
-    //     }
-    //     return true;
-    //   };
-
   const checkUser = async () => {
     try {
-        const response = await fetch(`http://localhost:1144/users/?email=${email}&password=${password}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-        const result = await response.json();
-
+        const response = await fetch(`http://localhost:1144/auth/?email=${email}&password=${password}`, {
+            method: 'GET'
+        });
+        
         if (!response.ok) {
-          console.log(result.message);
-          return;
+            console.error(`Error: ${response.status}`);
+            return;
         }
-    
+        
+        const result = await response.json();
+        
         localStorage.setItem("token", result.token);
         localStorage.setItem("role", result.role);
+        localStorage.setItem("email", result.email);
 
 
         window.location.href = '/';
@@ -58,7 +42,7 @@ const LoginCom = () => {
             <h2 className="text-2xl font-bold mb-6 text-center text-white">SignIn Your Account</h2>
             <form onSubmit={(e)=>{e.preventDefault();}}>
                 <div className="mb-4">
-                    <label className="block text-white text-sm font-bold mb-2" for="email">Email</label>
+                    <label className="block text-white text-sm font-bold mb-2" htmlFor="email">Email</label>
                     <input 
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                         id="email" 
@@ -71,7 +55,7 @@ const LoginCom = () => {
                         placeholder="Enter your email" />
                 </div>
                 <div className="mb-6">
-                    <label className="block text-white text-sm font-bold mb-2" for="password">Password</label>
+                    <label className="block text-white text-sm font-bold mb-2" htmlFor="password">Password</label>
                     <input 
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
                         id="password" 

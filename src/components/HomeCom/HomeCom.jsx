@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCube, Navigation, Autoplay } from 'swiper/modules';
 import expressjsIcon from "../../assets/expressjs.png";
@@ -16,6 +16,30 @@ import { useNavigate } from 'react-router-dom';
 
 const HomeCom = () => {
     const nav = useNavigate();
+    const [email, setEmail] = useState('');
+
+    const subscribeUser = async () => {
+        try {
+            const response = await fetch(`http://localhost:1144/users/subscribe`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email
+                }),
+            });
+            
+            const result = await response.json();
+            alert(result.message);
+            if (!response.ok) {
+                return;
+            }
+        } catch (error) {
+            alert("Server error. Please try again. ");
+        }
+    }
+
   return (
     <section className="mx-auto px-4 dark:bg-gray-800 pb-12">
         <section className="text-center py-12">
@@ -53,11 +77,12 @@ const HomeCom = () => {
                     type="email" 
                     placeholder="Enter your email address" 
                     className="w-full lg:w-64 px-4 py-2 rounded-l-lg text-gray-800 focus:outline-none
-                                dark:bg-blue-600 dark:text-white dark:placeholder:text-white" />
+                                dark:bg-blue-600 dark:text-white dark:placeholder:text-white" 
+                                onChange={(e) => setEmail(e.target.value)}/>
                 <button type="submit" 
                     className="bg-white text-blue-600 px-6 py-2 rounded-r-lg hover:bg-blue-600 hover:text-white transition duration-1000 
                                 dark:bg-blue-600 dark:text-white dark:hover:bg-white dark:hover:text-blue-600"
-                    onClick={()=>{/*add email and coplected message*/}}>Subscribe</button>
+                    onClick={()=>{ subscribeUser(); }}>Subscribe</button>
             </form>
         </section>
 
